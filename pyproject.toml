@@ -8,7 +8,7 @@ packages = [{include = "test_repo"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-Pillow = "9.1.1" # 0 issues
+Pillow = "10.0.1" # 0 issues
 #Pillow = "9.1.0" # 1 issue
 #Pillow = "8.3.2" # 5 issues
 Glances = "3.2.4"
