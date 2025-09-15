@@ -2,8 +2,7 @@ import requests
 
 # Replace with your GitLab instance and personal access token
 GITLAB_URL = "https://gitlab.com"  # or your self-hosted GitLab instance
-# not valid token
-TOKEN = "glpat-ognJxdM4Qq12s6SM3wuL"
+
 
 def get_groups():
     url = f"{GITLAB_URL}/api/v4/groups"
