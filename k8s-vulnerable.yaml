@@ -1,0 +1,88 @@
+# Kubernetes vulnerabilities
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vulnerable-pod
+spec:
+  # Vulnerability #1: No security context
+  containers:
+  - name: app
+    image: nginx:latest  # Vulnerability #2: Latest tag
+    # Vulnerability #3: Running as root (no securityContext)
+    ports:
+    - containerPort: 80
+    env:
+    # Vulnerability #4: Hardcoded secrets in env vars
+    - name: DATABASE_PASSWORD
+      value: "admin123"
+    - name: API_KEY
+      value: "sk-abcd1234567890"
+    volumeMounts:
+    # Vulnerability #5: Mounting sensitive host paths
+    - name: host-root
+      mountPath: /host
+    - name: docker-sock
+      mountPath: /var/run/docker.sock
+  # Vulnerability #6: Privileged container
+  securityContext:
+    privileged: true
+    runAsUser: 0  # Vulnerability #7: Explicit root user
+  volumes:
+  # Vulnerability #8: Host path volumes
+  - name: host-root
+    hostPath:
+      path: /
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock
+  # Vulnerability #9: Host networking
+  hostNetwork: true
+  # Vulnerability #10: Host PID namespace
+  hostPID: true
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vulnerable-service
+spec:
+  # Vulnerability #11: NodePort service without network policies
+  type: NodePort
+  ports:
+  - port: 80
+    nodePort: 30080
+  selector:
+    app: vulnerable-app
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: insecure-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: insecure-app
+  template:
+    metadata:
+      labels:
+        app: insecure-app
+    spec:
+      containers:
+      - name: app
+        image: vulnerable-app:latest
+        # Vulnerability #12: No resource limits
+        env:
+        - name: SECRET_TOKEN
+          value: "hardcoded-secret-123"
+        # Vulnerability #13: No liveness/readiness probes
+        securityContext:
+          # Vulnerability #14: Excessive capabilities
+          capabilities:
+            add: ["SYS_ADMIN", "NET_ADMIN"]
+          allowPrivilegeEscalation: true
+          readOnlyRootFilesystem: false
+      # Vulnerability #15: No Pod Security Policy/Standards
+      automountServiceAccountToken: true
