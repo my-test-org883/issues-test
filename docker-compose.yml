@@ -1,0 +1,60 @@
+# Configuration vulnerabilities in Docker Compose
+
+version: '3.8'
+
+services:
+  # Vulnerability #1: Container running as root
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    # Vulnerable: No user specification, runs as root
+    volumes:
+      - /etc/passwd:/etc/passwd:ro
+      # Vulnerable: Mounting sensitive host files
+
+  # Vulnerability #2: Privileged container
+  database:
+    image: postgres:13
+    privileged: true  # Vulnerable: Privileged mode
+    environment:
+      # Vulnerability #3: Hardcoded credentials
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_USER: postgres
+    ports:
+      - "5432:5432"
+    # Vulnerability #4: No network isolation
+
+  # Vulnerability #5: Exposed internal ports
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"  # Vulnerable: Redis exposed without auth
+    command: redis-server --protected-mode no
+    # Vulnerable: Protected mode disabled
+
+  # Vulnerability #6: Insecure volume mounts
+  app:
+    image: node:16
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Vulnerable: Docker socket
+      - /:/host  # Vulnerable: Root filesystem mount
+    environment:
+      - NODE_ENV=production
+      # Vulnerability #7: Missing security headers
+    security_opt:
+      - seccomp:unconfined  # Vulnerable: Disabled seccomp
+      - apparmor:unconfined  # Vulnerable: Disabled AppArmor
+
+  # Vulnerability #8: Shared network namespace
+  monitoring:
+    image: prom/prometheus
+    network_mode: "host"  # Vulnerable: Host networking
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+    # Vulnerable: Excessive host access
+
+# Vulnerability #9: No resource limits defined
+# Vulnerability #10: No health checks defined
+# Vulnerability #11: Using latest tags (not pinned versions)
