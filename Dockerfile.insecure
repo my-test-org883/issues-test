@@ -1,0 +1,49 @@
+# Insecure Dockerfile with multiple vulnerabilities
+
+FROM ubuntu:latest
+# Vulnerability #1: Using latest tag instead of specific version
+
+# Vulnerability #2: Running as root user (no USER directive)
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    python3 \
+    python3-pip \
+    # Vulnerability #3: Not cleaning apt cache
+    && echo "admin:password123" | chpasswd
+    # Vulnerability #4: Hardcoded credentials in layer
+
+# Vulnerability #5: Copying sensitive files
+COPY secrets.txt /app/secrets.txt
+COPY ~/.ssh/id_rsa /app/ssh_key
+
+# Vulnerability #6: Exposing unnecessary ports
+EXPOSE 22 3306 5432 6379 9200
+
+# Vulnerability #7: Storing secrets in environment variables
+ENV DATABASE_PASSWORD=supersecret123
+ENV API_KEY=sk-1234567890abcdef
+ENV JWT_SECRET=mysecretkey
+
+# Vulnerability #8: Installing packages with known vulnerabilities
+RUN pip3 install django==2.0.1 requests==2.6.0
+
+# Vulnerability #9: Adding untrusted repositories
+RUN wget -qO - https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+
+# Vulnerability #10: Running with privileged operations
+RUN chmod 777 /app
+
+# Vulnerability #11: No health check
+WORKDIR /app
+
+# Vulnerability #12: Executing as root at runtime
+CMD ["python3", "app.py"]
+
+# Additional vulnerabilities:
+# - No HEALTHCHECK instruction
+# - No resource limits
+# - Overly broad EXPOSE directives
+# - No security scanning
+# - Secrets in build context
+# - No non-root user creation
