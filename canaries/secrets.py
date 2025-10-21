@@ -14,7 +14,7 @@ AWS_ACCESS_KEY = "AKIAIOSFODNN7EXAMPLE"
 AWS_SECRET_KEY = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
 
 # Vulnerability #5: Slack Bot Token
-SLACK_TOKEN = "xoxb-1234567890-1234567890123-abcdefghijklmnopqrstuvwx"
+SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
 
 # Vulnerability #6: Google API Key
 GOOGLE_API_KEY = "AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI"
