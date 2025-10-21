@@ -1,9 +1,11 @@
 import requests
+import os
 
 # Replace with your GitLab instance and personal access token
 GITLAB_URL = "https://gitlab.com"  # or your self-hosted GitLab instance
-# not valid token but should trigger gitleaks
-TOKEN = "glpat-ognJxdM4Qq12s6SM3wuL"
+# Load token from environment variable instead of hardcoding
+TOKEN = os.environ.get("GITLAB_TOKEN")
+assert TOKEN, "GITLAB_TOKEN environment variable must be set"
 
 
 def get_groups():
