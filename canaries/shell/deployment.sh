@@ -41,7 +41,7 @@ for server in $server_list; do
 done
 
 # Vulnerability #9: Using curl without certificate verification
-API_TOKEN="sk-1234567890abcdefghijklmnopqrstuvwx"
+API_TOKEN="${API_TOKEN:-}"
 curl -k -H "Authorization: Bearer $API_TOKEN" \
      https://api.internal.com/deploy \
      -d "{\"app\":\"$APP_NAME\",\"version\":\"$VERSION\"}"
